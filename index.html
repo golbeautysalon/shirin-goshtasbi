@@ -38,7 +38,6 @@ body{min-height:100vh;background:radial-gradient(circle at 50% 20%,#7a284a,#3b0d
     <div class="contact-phone">تلفن شعبه آسوریک: ۸۸۰۶۰۶۷۰ - ۸۸۰۶۰۶۷۱</div>
   </div>
 </div>
-<div class="page"><img src="images/blank.jpg" alt=""></div>
 <div class="page"><img src="images/page03.jpg" alt="نمونه کار"></div>
 <div class="page"><img src="images/page02.jpg" alt="مدرک"></div>
 <div class="page"><img src="images/page01.jpg" alt="صفحه مشخصات"></div>
@@ -65,14 +64,26 @@ window.addEventListener("load",async()=>{
          const photo=document.createElement("img");photo.src=name;photo.alt="نمونه‌کار جدید";
          page.appendChild(photo);book.insertBefore(page,before);
        }
-       if(valid.length%2===1){
-         const blank=document.createElement("div");blank.className="page";
-         const image=document.createElement("img");image.src="images/blank.jpg";image.alt="";
-         blank.appendChild(image);book.insertBefore(blank,before);
+       // Preserve an even page count without displaying an empty page.
+       // Original pages (without the former blank) total five.
+       if(valid.length%2===0){
+         const extra=document.createElement("div");extra.className="page";
+         const logo=document.createElement("img");
+         logo.src="images/salon-logo.png";
+         logo.alt="سالن زیبایی گل";
+         logo.style.background="#faf7f5";
+         logo.style.objectFit="contain";
+         extra.appendChild(logo);book.insertBefore(extra,before);
        }
      }
    }
  }catch(e){console.warn("فهرست عکس‌ها دریافت نشد؛ صفحات اصلی نمایش داده می‌شوند.",e);}
+ // Network failure fallback: keep the closed-cover layout valid.
+ if(book.querySelectorAll(".page").length%2!==0){
+   const extra=document.createElement("div");extra.className="page";
+   const logo=document.createElement("img");logo.src="images/salon-logo.png";logo.alt="سالن زیبایی گل";
+   extra.appendChild(logo);book.insertBefore(extra,before);
+ }
  pf=new St.PageFlip(document.getElementById("book"),{
  width:450,height:600,size:"stretch",minWidth:280,maxWidth:520,minHeight:380,maxHeight:740,
  maxShadowOpacity:.55,showCover:true,mobileScrollSupport:false,usePortrait:true,flippingTime:900,
