@@ -49,7 +49,30 @@ body{min-height:100vh;background:radial-gradient(circle at 50% 20%,#7a284a,#3b0d
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 <script>
 let pf=null;
-window.addEventListener("load",()=>{
+window.addEventListener("load",async()=>{
+ // New work images are listed automatically by GitHub Actions.
+ const book=document.getElementById("book");
+ const before=book.querySelector('img[src="images/page03.jpg"]').parentElement;
+ try {
+   const response=await fetch("./works.json?t="+Date.now(),{cache:"no-store"});
+   if(response.ok){
+     const names=await response.json();
+     if(Array.isArray(names)){
+       const valid=names.filter(n=>typeof n==="string" && /^images\/works\/[a-zA-Z0-9._-]+\.(jpg|jpeg|png|webp|gif)$/i.test(n));
+       // Pages are stored in reverse order for the Persian book.
+       for(const name of valid){
+         const page=document.createElement("div");page.className="page";
+         const photo=document.createElement("img");photo.src=name;photo.alt="نمونه‌کار جدید";
+         page.appendChild(photo);book.insertBefore(page,before);
+       }
+       if(valid.length%2===1){
+         const blank=document.createElement("div");blank.className="page";
+         const image=document.createElement("img");image.src="images/blank.jpg";image.alt="";
+         blank.appendChild(image);book.insertBefore(blank,before);
+       }
+     }
+   }
+ }catch(e){console.warn("فهرست عکس‌ها دریافت نشد؛ صفحات اصلی نمایش داده می‌شوند.",e);}
  pf=new St.PageFlip(document.getElementById("book"),{
  width:450,height:600,size:"stretch",minWidth:280,maxWidth:520,minHeight:380,maxHeight:740,
  maxShadowOpacity:.55,showCover:true,mobileScrollSupport:false,usePortrait:true,flippingTime:900,
